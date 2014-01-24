@@ -3,11 +3,11 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.0.0
+Version: 1.0.1
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
 GitHub Plugin URI: https://github.com/mgibbs189/facetwp-cache
-GitHub Branch: 1.0.0
+GitHub Branch: 1.0.1
 
 Copyright 2014 Matt Gibbs
 
@@ -32,15 +32,19 @@ if ( !defined( 'ABSPATH' ) ) exit;
 /*
     TODO:
 
-    1. Settings page to customize FACETWP_CACHE_LIFETIME
-    2. Settings page to clear cache
-    3. Periodic cleanup with wp_schedule_event
-    4. "nocache" GET param to disable cache
+    - Settings page to customize FACETWP_CACHE_LIFETIME
+    - Settings page to clear cache
+    - "nocache" GET param to disable cache
 */
 class FWP_Cache
 {
 
     function __construct() {
+
+        // setup variables
+        define( 'FACETWP_CACHE_VERSION', '1.0.1' );
+        define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
+
         add_action( 'init' , array( $this, 'init' ) );
     }
 
@@ -49,29 +53,49 @@ class FWP_Cache
      * Intialize
      */
     function init() {
-        add_filter( 'facetwp_ajax_response', array( $this, 'facetwp_ajax_response' ), 10, 2 );
+
+        // upgrade
+        include( FACETWP_CACHE_DIR . '/includes/class-upgrade.php' );
+        $upgrade = new FacetWP_Cache_Upgrade();
+
+        add_filter( 'facetwp_ajax_response', array( $this, 'save_cache' ), 10, 2 );
+        add_action( 'facetwp_cache_cleanup', array( $this, 'cleanup' ) );
+
+        // Schedule daily cleanup
+        if ( !wp_next_scheduled( 'facetwp_cache_cleanup' ) ) {
+            wp_schedule_event( time(), 'daily', 'facetwp_cache_cleanup' );
+        }
     }
 
 
     /**
      * Cache the AJAX response
      */
-    function facetwp_ajax_response( $output, $params ) {
+    function save_cache( $output, $params ) {
         global $wpdb;
-
-        $data = $params['data'];
 
         // Caching support
         if ( defined( 'FACETWP_CACHE' ) && FACETWP_CACHE ) {
-            $cache_name = md5( json_encode( $data ) );
+            $cache_name = md5( json_encode( $params['data'] ) );
             $wpdb->insert( $wpdb->prefix . 'facetwp_cache', array(
                 'name' => $cache_name,
                 'value' => $output,
-                'expire' => date( 'Y-m-d H:i:s', strtotime( '+30 minutes' ) )
+                'expire' => date( 'Y-m-d H:i:s', time() + 3600 )
             ) );
         }
 
         return $output;
+    }
+
+
+    /**
+     * Delete expired cache
+     */
+    function cleanup() {
+        global $wpdb;
+
+        $now = date( 'Y-m-d H:i:s' );
+        $wpdb->query( "DELETE FROM {$wpdb->prefix}facetwp_cache WHERE expire < '$now'" );
     }
 }
 
