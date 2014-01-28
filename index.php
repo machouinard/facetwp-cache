@@ -3,11 +3,11 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.0.1
+Version: 1.0.2
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
 GitHub Plugin URI: https://github.com/mgibbs189/facetwp-cache
-GitHub Branch: 1.0.1
+GitHub Branch: 1.0.2
 
 Copyright 2014 Matt Gibbs
 
@@ -29,20 +29,13 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 if ( !defined( 'ABSPATH' ) ) exit;
 
 
-/*
-    TODO:
-
-    - Settings page to customize FACETWP_CACHE_LIFETIME
-    - Settings page to clear cache
-    - "nocache" GET param to disable cache
-*/
 class FWP_Cache
 {
 
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.0.1' );
+        define( 'FACETWP_CACHE_VERSION', '1.0.2' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
@@ -77,11 +70,16 @@ class FWP_Cache
         // Caching support
         if ( defined( 'FACETWP_CACHE' ) && FACETWP_CACHE ) {
             $cache_name = md5( json_encode( $params['data'] ) );
-            $wpdb->insert( $wpdb->prefix . 'facetwp_cache', array(
-                'name' => $cache_name,
-                'value' => $output,
-                'expire' => date( 'Y-m-d H:i:s', time() + 3600 )
-            ) );
+            $cache_lifetime = apply_filters( 'facetwp_cache_lifetime', 3600 );
+            $nocache = isset( $_POST['data']['http_params']['get']['nocache'] );
+
+            if ( false === $nocache ) {
+                $wpdb->insert( $wpdb->prefix . 'facetwp_cache', array(
+                    'name' => $cache_name,
+                    'value' => $output,
+                    'expire' => date( 'Y-m-d H:i:s', time() + $cache_lifetime )
+                ) );
+            }
         }
 
         return $output;

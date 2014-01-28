@@ -4,7 +4,10 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 define( 'FACETWP_CACHE', true );
 
-if ( isset( $_POST['action'] ) && 'facetwp_refresh' == $_POST['action'] ) {
+$action = isset( $_POST['action'] ) ? $_POST['action'] : '';
+$nocache = isset( $_POST['data']['http_params']['get']['nocache'] );
+
+if ( 'facetwp_refresh' == $action ) {
 
     global $table_prefix;
     $wpdb = new wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
@@ -23,7 +26,7 @@ if ( isset( $_POST['action'] ) && 'facetwp_refresh' == $_POST['action'] ) {
     $value = $wpdb->get_var( $sql );
 
     // Return cached version and EXIT
-    if ( null !== $value ) {
+    if ( null !== $value && false === $nocache ) {
         echo $value;
         exit;
     }
