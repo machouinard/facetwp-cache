@@ -3,11 +3,11 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.0.2
+Version: 1.1
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
 GitHub Plugin URI: https://github.com/mgibbs189/facetwp-cache
-GitHub Branch: 1.0.2
+GitHub Branch: 1.1
 
 Copyright 2014 Matt Gibbs
 
@@ -35,10 +35,11 @@ class FWP_Cache
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.0.2' );
+        define( 'FACETWP_CACHE_VERSION', '1.1' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
+        add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ), 999 );
     }
 
 
@@ -58,6 +59,11 @@ class FWP_Cache
         if ( !wp_next_scheduled( 'facetwp_cache_cleanup' ) ) {
             wp_schedule_event( time(), 'daily', 'facetwp_cache_cleanup' );
         }
+
+        // Manually purge cache
+        if ( isset( $_GET['fwpcache'] ) && current_user_can( 'manage_options' ) ) {
+            $this->cleanup( $_GET['fwpcache'] );
+        }
     }
 
 
@@ -70,12 +76,14 @@ class FWP_Cache
         // Caching support
         if ( defined( 'FACETWP_CACHE' ) && FACETWP_CACHE ) {
             $cache_name = md5( json_encode( $params['data'] ) );
+            $cache_uri = $params['data']['http_params']['uri'];
             $cache_lifetime = apply_filters( 'facetwp_cache_lifetime', 3600 );
-            $nocache = isset( $_POST['data']['http_params']['get']['nocache'] );
+            $nocache = isset( $params['data']['http_params']['get']['nocache'] );
 
             if ( false === $nocache ) {
                 $wpdb->insert( $wpdb->prefix . 'facetwp_cache', array(
                     'name' => $cache_name,
+                    'uri' => $cache_uri,
                     'value' => $output,
                     'expire' => date( 'Y-m-d H:i:s', time() + $cache_lifetime )
                 ) );
@@ -89,11 +97,67 @@ class FWP_Cache
     /**
      * Delete expired cache
      */
-    function cleanup() {
+    function cleanup( $uri = false ) {
         global $wpdb;
 
-        $now = date( 'Y-m-d H:i:s' );
-        $wpdb->query( "DELETE FROM {$wpdb->prefix}facetwp_cache WHERE expire < '$now'" );
+        if ( false === $uri ) {
+            $now = date( 'Y-m-d H:i:s' );
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}facetwp_cache WHERE expire < '$now'" );
+        }
+        elseif ( 'all' == $uri ) {
+            $wpdb->query( "TRUNCATE {$wpdb->prefix}facetwp_cache" );
+        }
+        elseif ( 'this' == $uri ) {
+            $uri = esc_sql( $this->get_uri() );
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}facetwp_cache WHERE uri = '$uri'" );
+        }
+    }
+
+
+    /**
+     * 
+     */
+    function admin_bar_menu( $wp_admin_bar ) {
+
+        // Only show the menu on the front-end
+        if ( is_admin() ) {
+            return;
+        }
+
+        $args = array(
+            array(
+                'id' => 'fwp-cache',
+                'title' => 'FWP',
+            ),
+            array(
+                'id' => 'fwp-cache-clear-page',
+                'title' => 'Clear cache (this page)',
+                'parent' => 'fwp-cache',
+                'href' => '?fwpcache=this',
+            ),
+            array(
+                'id' => 'fwp-cache-clear-all',
+                'title' => 'Clear cache (all)',
+                'parent' => 'fwp-cache',
+                'href' => '?fwpcache=all',
+            )
+        );
+
+        foreach ( $args as $arg ) {
+            $wp_admin_bar->add_node( $arg );
+        }
+    }
+
+
+    /**
+     * Get the current page URI
+     */
+    function get_uri() {
+        $uri = $_SERVER['REQUEST_URI'];
+        if ( false !== ( $pos = strpos( $uri, '?' ) ) ) {
+            $uri = substr( $uri, 0, $pos );
+        }
+        return trim( $uri, '/' );
     }
 }
 

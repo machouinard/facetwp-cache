@@ -27,6 +27,7 @@ class FacetWP_Cache_Upgrade
         CREATE TABLE {$wpdb->prefix}facetwp_cache (
             id BIGINT unsigned not null auto_increment,
             name VARCHAR(32),
+            uri VARCHAR(255),
             value LONGTEXT,
             expire DATETIME,
             PRIMARY KEY (id)
@@ -36,6 +37,10 @@ class FacetWP_Cache_Upgrade
 
 
     private function run_upgrade() {
+        global $wpdb;
 
+        if ( version_compare( $this->last_version, '1.1', '<' ) ) {
+            $wpdb->query( "ALTER TABLE {$wpdb->prefix}facetwp_cache ADD COLUMN uri VARCHAR(255) AFTER name" );
+        }
     }
 }
