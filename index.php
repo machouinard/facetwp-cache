@@ -7,7 +7,7 @@ Version: 1.1.1
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
 GitHub Plugin URI: https://github.com/mgibbs189/facetwp-cache
-GitHub Branch: 1.1
+GitHub Branch: 1.1.1
 
 Copyright 2014 Matt Gibbs
 
