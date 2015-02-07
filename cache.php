@@ -1,11 +1,10 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 define( 'FACETWP_CACHE', true );
 
 $action = isset( $_POST['action'] ) ? $_POST['action'] : '';
-$nocache = isset( $_POST['data']['http_params']['get']['nocache'] );
 
 if ( 'facetwp_refresh' == $action ) {
 
@@ -26,7 +25,7 @@ if ( 'facetwp_refresh' == $action ) {
     $value = $wpdb->get_var( $sql );
 
     // Return cached version and EXIT
-    if ( null !== $value && false === $nocache ) {
+    if ( null !== $value ) {
         echo $value;
         exit;
     }
