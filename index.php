@@ -6,7 +6,7 @@ Description: Caching support for FacetWP
 Version: 1.1.2
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
-GitHub Plugin URI: https://github.com/mgibbs189/facetwp-cache
+GitHub Plugin URI: https://github.com/FacetWP/facetwp-cache
 
 Copyright 2014 Matt Gibbs
 
