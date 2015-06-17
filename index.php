@@ -3,12 +3,12 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.1.2
+Version: 1.1.3
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
 GitHub Plugin URI: https://github.com/FacetWP/facetwp-cache
 
-Copyright 2014 Matt Gibbs
+Copyright 2015 Matt Gibbs
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@ class FWP_Cache
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.1.2' );
+        define( 'FACETWP_CACHE_VERSION', '1.1.3' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
@@ -119,7 +119,7 @@ class FWP_Cache
     function admin_bar_menu( $wp_admin_bar ) {
 
         // Only show the menu on the front-end
-        if ( is_admin() ) {
+        if ( is_admin() || ! current_user_can( 'manage_options' ) ) {
             return;
         }
 
