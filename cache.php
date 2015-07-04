@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'FACETWP_CACHE', true );
 
 $action = isset( $_POST['action'] ) ? $_POST['action'] : '';
+$data = isset( $_POST['data'] ) ? $_POST['data'] : array();
 
 if ( 'facetwp_refresh' == $action ) {
 
@@ -12,9 +13,13 @@ if ( 'facetwp_refresh' == $action ) {
     $wpdb = new wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
     $wpdb->prefix = $table_prefix;
 
+    // Timestamp
     $now = date( 'Y-m-d H:i:s' );
-    $cache_name = json_encode( $_POST['data'] );
-    $cache_name = md5( $cache_name );
+
+    // Exclude some settings
+    unset( $data['soft_refresh'] );
+    unset( $data['first_load'] );
+    $cache_name = md5( json_encode( $data ) );
 
     // Check for a cached version
     $sql = "
