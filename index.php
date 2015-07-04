@@ -78,7 +78,7 @@ class FWP_Cache
             // Exclude some settings
             $data = $params['data'];
             unset( $data['soft_refresh'] );
-            unset( $data['first_load'] );
+            //unset( $data['first_load'] );
 
             // Generate the cache token
             $cache_name = md5( json_encode( $data ) );

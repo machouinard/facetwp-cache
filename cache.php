@@ -18,7 +18,7 @@ if ( 'facetwp_refresh' == $action ) {
 
     // Exclude some settings
     unset( $data['soft_refresh'] );
-    unset( $data['first_load'] );
+    //unset( $data['first_load'] );
     $cache_name = md5( json_encode( $data ) );
 
     // Check for a cached version
