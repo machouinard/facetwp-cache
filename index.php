@@ -55,7 +55,7 @@ class FWP_Cache
         add_action( 'facetwp_cache_cleanup', array( $this, 'cleanup' ) );
 
         // Schedule daily cleanup
-        if ( !wp_next_scheduled( 'facetwp_cache_cleanup' ) ) {
+        if ( ! wp_next_scheduled( 'facetwp_cache_cleanup' ) ) {
             wp_schedule_event( time(), 'daily', 'facetwp_cache_cleanup' );
         }
 
@@ -74,10 +74,19 @@ class FWP_Cache
 
         // Caching support
         if ( defined( 'FACETWP_CACHE' ) && FACETWP_CACHE ) {
-            $cache_name = md5( json_encode( $params['data'] ) );
-            $cache_uri = $params['data']['http_params']['uri'];
+
+            // Exclude some settings
+            $data = $params['data'];
+            unset( $data['soft_refresh'] );
+            unset( $data['first_load'] );
+
+            // Generate the cache token
+            $cache_name = md5( json_encode( $data ) );
+            $cache_uri = $data['http_params']['uri'];
+
+            // Set the cache expiration
             $cache_lifetime = apply_filters( 'facetwp_cache_lifetime', 3600 );
-            $nocache = isset( $params['data']['http_params']['get']['nocache'] );
+            $nocache = isset( $data['http_params']['get']['nocache'] );
 
             if ( false === $nocache ) {
                 $wpdb->insert( $wpdb->prefix . 'facetwp_cache', array(
