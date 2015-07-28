@@ -52,6 +52,7 @@ class FWP_Cache
         $upgrade = new FacetWP_Cache_Upgrade();
 
         add_filter( 'facetwp_ajax_response', array( $this, 'save_cache' ), 10, 2 );
+        add_action( 'facetwp_inject_template', array( $this, 'inject_template' ) );
         add_action( 'facetwp_cache_cleanup', array( $this, 'cleanup' ) );
 
         // Schedule daily cleanup
@@ -98,6 +99,16 @@ class FWP_Cache
         }
 
         return $output;
+    }
+
+
+    /**
+     * Support CSS-based templates
+     * Save the cached output right before PHP shutdown
+     */
+    function inject_template( $output ) {
+        $data = stripslashes_deep( $_POST['data'] );
+        $this->save_cache( json_encode( $output ), array( 'data' => $data ) );
     }
 
 
