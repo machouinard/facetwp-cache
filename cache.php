@@ -16,8 +16,7 @@ if ( 'facetwp_refresh' == $action ) {
     // Timestamp
     $now = date( 'Y-m-d H:i:s' );
 
-    // Exclude some settings
-    unset( $data['soft_refresh'] );
+    // MD5 hash
     $cache_name = md5( json_encode( $data ) );
 
     // Check for a cached version

@@ -3,7 +3,7 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.2
+Version: 1.2.1
 Author: Matt Gibbs
 Author URI: https://facetwp.com/
 GitHub Plugin URI: https://github.com/FacetWP/facetwp-cache
@@ -34,7 +34,7 @@ class FWP_Cache
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.2' );
+        define( 'FACETWP_CACHE_VERSION', '1.2.1' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
@@ -75,10 +75,7 @@ class FWP_Cache
 
         // Caching support
         if ( defined( 'FACETWP_CACHE' ) && FACETWP_CACHE ) {
-
-            // Exclude some settings
             $data = $params['data'];
-            unset( $data['soft_refresh'] );
 
             // Generate the cache token
             $cache_name = md5( json_encode( $data ) );
