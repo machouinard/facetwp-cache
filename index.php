@@ -3,42 +3,40 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.2.1
-Author: Matt Gibbs
-Author URI: https://facetwp.com/
-GitHub Plugin URI: https://github.com/FacetWP/facetwp-cache
-
-Copyright 2015 Matt Gibbs
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, see <http://www.gnu.org/licenses/>.
+Version: 1.2.2
+Author: FacetWP, LLC
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
-// exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+defined( 'ABSPATH' ) or exit;
 
 
-class FWP_Cache
+class FacetWP_Cache
 {
+
+    private static $instance;
+
 
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.2.1' );
+        define( 'FACETWP_CACHE_VERSION', '1.2.2' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
         add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ), 999 );
+    }
+
+
+    /**
+     * Singleton
+     */
+    public static function instance() {
+        if ( ! isset( self::$instance ) ) {
+            self::$instance = new self;
+        }
+        return self::$instance;
     }
 
 
@@ -122,9 +120,11 @@ class FWP_Cache
         elseif ( 'all' == $uri ) {
             $wpdb->query( "TRUNCATE {$wpdb->prefix}facetwp_cache" );
         }
-        elseif ( 'this' == $uri ) {
-            $uri = esc_sql( $this->get_uri() );
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}facetwp_cache WHERE uri = '$uri'" );
+        else {
+            $uri = ( 'this' == $uri ) ? $this->get_uri() : $uri;
+            $wpdb->query(
+                $wpdb->prepare( "DELETE FROM {$wpdb->prefix}facetwp_cache WHERE uri = %s", $uri )
+            );
         }
     }
 
@@ -177,4 +177,9 @@ class FWP_Cache
 }
 
 
-$fwp_cache = new FWP_Cache();
+function FWP_Cache() {
+    return FacetWP_Cache::instance();
+}
+
+
+$fwp_cache = FWP_Cache();
