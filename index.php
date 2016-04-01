@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: FacetWP - Cache
-Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
 Version: 1.2.2
 Author: FacetWP, LLC
+Author URI: https://facetwp.com/
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
