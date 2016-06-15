@@ -1,16 +1,16 @@
 <?php
 /*
 Plugin Name: FacetWP - Cache
+Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.2.2
+Version: 1.3
 Author: FacetWP, LLC
-Author URI: https://facetwp.com/
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+GitHub URI: facetwp/facetwp-cache
 */
 
 defined( 'ABSPATH' ) or exit;
 
+include( dirname( __FILE__ ) . '/github-updater.php' );
 
 class FacetWP_Cache
 {
@@ -21,7 +21,7 @@ class FacetWP_Cache
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.2.2' );
+        define( 'FACETWP_CACHE_VERSION', '1.3' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
