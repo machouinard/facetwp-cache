@@ -19,7 +19,7 @@ class FacetWP_Cache
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_CACHE_VERSION', '1.3' );
+        define( 'FACETWP_CACHE_VERSION', '1.3.1' );
         define( 'FACETWP_CACHE_DIR', dirname( __FILE__ ) );
 
         add_action( 'init' , array( $this, 'init' ) );
