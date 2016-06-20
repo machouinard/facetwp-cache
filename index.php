@@ -3,14 +3,12 @@
 Plugin Name: FacetWP - Cache
 Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
-Version: 1.3
+Version: 1.3.1
 Author: FacetWP, LLC
 GitHub URI: facetwp/facetwp-cache
 */
 
 defined( 'ABSPATH' ) or exit;
-
-include( dirname( __FILE__ ) . '/github-updater.php' );
 
 class FacetWP_Cache
 {
