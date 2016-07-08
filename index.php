@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: FacetWP - Cache
-Plugin URI: https://facetwp.com/
 Description: Caching support for FacetWP
 Version: 1.3.1
 Author: FacetWP, LLC
+Author URI: https://facetwp.com/
 GitHub URI: facetwp/facetwp-cache
 */
 
@@ -78,7 +78,10 @@ class FacetWP_Cache
             $cache_uri = $data['http_params']['uri'];
 
             // Set the cache expiration
-            $cache_lifetime = apply_filters( 'facetwp_cache_lifetime', 3600 );
+            $cache_lifetime = apply_filters( 'facetwp_cache_lifetime', 3600, array(
+                'uri' => $cache_uri
+            ) );
+
             $nocache = isset( $data['http_params']['get']['nocache'] );
 
             if ( false === $nocache ) {
