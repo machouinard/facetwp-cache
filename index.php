@@ -71,7 +71,14 @@ class FacetWP_Cache
 
         // Caching support
         if ( defined( 'FACETWP_CACHE' ) && FACETWP_CACHE ) {
-            $data = $params['data'];
+
+	        //* Check for cookies set during Plan comparision
+	        $facetdata = isset( $_COOKIE['facetdata'] ) ? $_COOKIE['facetdata'] : '';
+
+	        $data = $params['data'];
+
+	        //* Add any comparison IDs to array for use in cache name
+	        $data['facetdata'] = $facetdata;
 
             // Generate the cache token
             $cache_name = md5( json_encode( $data ) );

@@ -16,6 +16,12 @@ if ( 'facetwp_refresh' == $action ) {
     // Timestamp
     $now = date( 'Y-m-d H:i:s' );
 
+	//* Check for cookies set during Plan comparision
+	$facetdata = isset( $_COOKIE['facetdata'] ) ? $_COOKIE['facetdata'] : '';
+
+	//* Add any comparison IDs to array for use in cache name
+	$data['facetdata'] = $facetdata;
+
     // MD5 hash
     $cache_name = md5( json_encode( $data ) );
 
